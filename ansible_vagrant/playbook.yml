@@ -24,6 +24,7 @@
   - andrelohmann.nodesource
   - andrelohmann.localtunnel
   - next-dev
+  - set-env
 
   tasks:
 

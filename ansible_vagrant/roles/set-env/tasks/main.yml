@@ -1,0 +1,10 @@
+---
+
+- name: add .env file with shopify credentials
+  template:
+    src: env.j2
+    dest: /home/vagrant/application/.env
+    mode: 0775
+    owner: vagrant
+    group: vagrant
+...
