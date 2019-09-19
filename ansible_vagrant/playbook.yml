@@ -1,0 +1,135 @@
+---
+
+- hosts: all
+  become: true
+  become_method: sudo
+
+  vars:
+    nodesource_nodejs_version: '10' # LTS for create-react-app dependency
+    docker_users: vagrant
+    localtunnel_port: 3000
+
+  pre_tasks:
+  - name: check for file custom_vars.yml
+    stat:
+      path: custom_vars.yml
+    register: stat_custom_vars
+  - name: load custom vars, if existent
+    include_vars:
+      file: custom_vars.yml
+    when: stat_custom_vars.stat.exists
+
+  roles:
+  - andrelohmann.root_colored_prompt
+  - andrelohmann.nodesource
+  - andrelohmann.localtunnel
+  - next-dev
+
+  tasks:
+
+  - name: check for package.json in application folder
+    stat:
+      path: /home/vagrant/application/package.json
+    register: stat_result
+
+  - name: initialize react app, if package.json does not exist on application folder
+    block:
+
+    - name: make sure, /home/vargant/app exists
+      file:
+        path: /home/vagrant/app
+        owner: vagrant
+        group: vagrant
+        mode: '0775'
+        state: directory
+
+    - name: initialize npm app
+      shell: npm init -y
+      args:
+        chdir: /home/vagrant/app
+        executable: /bin/bash
+      become: yes
+      become_user: vagrant
+
+    - name: initialize next.js
+      shell: npm install --save react react-dom next
+      args:
+        chdir: /home/vagrant/app
+        executable: /bin/bash
+      become: yes
+      become_user: vagrant
+
+    - name: mv app/node_modules to /home/vagrant/node_modules
+      shell: mv /home/vagrant/app/node_modules /home/vagrant/node_modules
+      args:
+        executable: /bin/bash
+      become: yes
+      become_user: vagrant
+
+    - name: mv app/* to /home/vagrant/application
+      shell: mv /home/vagrant/app/* /home/vagrant/application/
+      args:
+        executable: /bin/bash
+      become: yes
+      become_user: vagrant
+
+    - name: Remove app folder
+      file:
+        path: /home/vagrant/app
+        state: absent
+
+    - name: create a symbolic link
+      file:
+        src: /home/vagrant/node_modules
+        dest: /home/vagrant/application/node_modules
+        owner: vagrant
+        group: vagrant
+        state: link
+
+    - name: start next-dev
+      systemd:
+        name: next-dev
+        state: restarted
+
+    when: stat_result.stat.exists == False
+
+  - name: check for /home/vagrant/node_modules folder
+    stat:
+      path: /home/vagrant/node_modules
+    register: stat_result
+
+  - name: create symlink and install node_modules, if node_modules does not exist on application folder
+    block:
+
+    - name: make sure, /home/vargant/node_modules exists
+      file:
+        path: /home/vagrant/node_modules
+        owner: vagrant
+        group: vagrant
+        mode: '0775'
+        state: directory
+
+    - name: create a symbolic link
+      file:
+        src: /home/vagrant/node_modules
+        dest: /home/vagrant/application/node_modules
+        owner: vagrant
+        group: vagrant
+        state: link
+
+    - name: run npm install
+      shell: npm install
+      args:
+        chdir: /home/vagrant/application/
+        executable: /bin/bash
+      become: yes
+      become_user: vagrant
+
+    - name: start next-dev
+      systemd:
+        name: next-dev
+        state: restarted
+
+    when: stat_result.stat.exists == False
+
+...

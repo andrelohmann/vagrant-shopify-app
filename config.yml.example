@@ -1,0 +1,7 @@
+---
+configs:
+  memory: "1024"
+  cpus: "2"
+  ip: "192.168.175.57"
+  domain: shopify.lokal
+...

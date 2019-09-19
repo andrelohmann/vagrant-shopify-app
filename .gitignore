@@ -1,0 +1,9 @@
+/.vagrant
+/config.yml
+/*.log
+/application/.next
+/application/node_modules
+/application/nohup.out
+/ansible_vagrant/roles/*
+!/ansible_vagrant/roles/next-dev
+/ansible_vagrant/custom_vars.yml

@@ -1,0 +1,6 @@
+---
+localtunnel_subdomain: __YOUR_LOCAL_TUNNEL_SUBDOMAIN__
+shopify_shop_url: __YOUR_SHOPIFY_SHOP_URL__
+shopify_api_key: __YOUR_SHOPIFY_APP_API_KEY__
+shopify_api_secret: __YOUR_SHOPIFY_APP_API_SECRET__
+...

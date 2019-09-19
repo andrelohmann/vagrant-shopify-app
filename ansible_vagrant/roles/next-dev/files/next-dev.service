@@ -1,0 +1,15 @@
+[Unit]
+Description=npm run dev - background
+After=network.target
+
+[Service]
+WorkingDirectory=/home/vagrant/application
+ExecStart=/usr/bin/npm run dev
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=next-dev
+User=vagrant
+
+[Install]
+WantedBy=multi-user.target
